@@ -13,9 +13,18 @@ var blocks;
 var stars;
 var flag;
 var button;
+var recordsBtn;
 var state = 'run';
 var text;
+var bounds;
+var bottomGround;
 var currentSite = 1;
+var ground;
+var graphicsGround;
+var headWindow;
+var headWindowTween;
+var numGroup;
+
 
 var data = [{
     //stage 1
@@ -24,7 +33,11 @@ var data = [{
         y: 300
     }],
 
-    blocks: [],
+    blocks: [{
+        index: 4,
+        x: 200,
+        y: 400
+    }],
 
     bricks: [{
         index: 3,
@@ -40,15 +53,40 @@ var data = [{
         x: 200,
         y: 350
     },
-    button: {
-        x: 200,
-        y: 400
-    },
+
     flag: {
         x: 550,
         y: 350
     }
     //stage 2
+}, {
+    stars: [{
+        x: 430,
+        y: 300
+    }],
+
+    blocks: [{
+        index: 4,
+        x: 200,
+        y: 400
+    }],
+
+    bricks: [{
+        index: 3,
+        x: 200,
+        y: 450
+    }],
+
+    player: {
+        x: 200,
+        y: 350
+    },
+
+    flag: {
+        x: 550,
+        y: 350
+    }
+    //stage 3
 }, {
     stars: [{
         x: 450,
@@ -72,7 +110,7 @@ var data = [{
     }, {
         index: 4,
         x: 100,
-        y: 450
+        y: 440
     }],
 
     bricks: [{
@@ -94,18 +132,15 @@ var data = [{
     }],
 
     player: {
-        x: 10,
-        y: 400
+        x: 110,
+        y: 390
     },
-    button: {
-        x: 0,
-        y: 450
-    },
+
     flag: {
         x: 400,
         y: 340
     }
-    //stage 3
+    //stage 4
 }, {
     stars: [{
         x: 400,
@@ -158,7 +193,7 @@ var data = [{
         y: 380
     }
 }, {
-    //stage 4
+    //stage 5
     stars: [{
         x: 550,
         y: 200
@@ -210,7 +245,7 @@ var data = [{
         x: 370,
         y: 380
     }
-}];
+}, {}, {}, {}, {}, {}];
 
 function preload() {
     game.load.spritesheet('block0', 'png/block0.png', 64, 32);
@@ -233,25 +268,89 @@ function preload() {
 
     // game.load.spritesheet('build', 'png/build.png', 124, 50);
     // game.load.spritesheet('run', 'png/run.png', 124, 50);
-    // game.load.spritesheet('wall', 'png/wall.png', 800, 16);
+    game.load.spritesheet('ground', 'png/ground.png', 1000, 900);
 
     game.load.spritesheet('build', 'png/build1.png', 124, 50);
     game.load.spritesheet('run', 'png/run1.png', 124, 50);
+    game.load.spritesheet('recordsBtn', 'png/records.png', 124, 50);
 
 }
 
 function create() {
-
+    //console.log(localStorage.getItem("reached-level"));
     game.physics.startSystem(Phaser.Physics.ARCADE);
-    game.stage.backgroundColor = 'blank';
+    //game.stage.backgroundColor = 'blank';
     //game.stage.backgroundColor = '#FFFFCC';
+    // localStorage.setItem("reached-level", '1');
 
-    //var wall1 = game.add.sprite(0, 530, 'wall');
-    //var wall2 = game.add.sprite(0, 30, 'wall');
+
+    // if (localStorage.getItem("reached-level") == null) {
+    //     localStorage.setItem("reached-level", currentSite);
+    // } else {
+    //     currentSite = parseInt(localStorage.getItem("reached-level"));
+    // }
+
+
+    bounds = new Phaser.Rectangle(0, 0, game.width, game.height * 0.9);
+    //  Create a graphic so you can see the bounds
+    var graphics = game.add.graphics(bounds.x, bounds.y);
+    graphics.beginFill('black');
+    graphics.drawRect(0, 0, bounds.width, bounds.height);
+    graphics.endFill();
+    game.physics.arcade.enableBody(bounds);
+    //bounds.immovable = true;
+
+    // ground = game.add.sprite(0, game.height * 0.9, 'ground');
+    // //ground.scale.setTo(2, 6);
+    // game.physics.arcade.enableBody(ground);
+    // ground.body.immovable = true;
+
+    var graphicsGround = new Phaser.Graphics(this.game, 0, 0);
+    graphicsGround.beginFill(0xC3C3C3);
+    graphicsGround.drawRect(0, 0, game.width, game.height * 0.1);
+    graphicsGround.endFill();
+    bottomGround = game.add.sprite(0, game.height * 0.9, graphicsGround.generateTexture());
+
+    game.physics.arcade.enableBody(bottomGround);
+    bottomGround.body.immovable = true;
+
+    //graphics1.drawRect(0, 0, 100, 100);
+
+
+    button = game.add.sprite(game.width / 3, game.height * 0.92, 'run');
+    button.anchor.x = 0.5;
+    // game.physics.arcade.enableBody(button);
+    // button.body.immovable = true;
+    button.inputEnabled = true;
+    button.events.onInputDown.add(buildAndRun);
+
+
+    recordsBtn = game.add.sprite(game.width / 3 * 2, game.height * 0.92, 'recordsBtn');
+    recordsBtn.anchor.x = 0.5;
+
+    recordsBtn.inputEnabled = true;
+    recordsBtn.events.onInputDown.add(checkSite);
+    // buttonBounds = new Phaser.Rectangle(0, game.height * 0.85, game.width, game.height * 0.15);
+    // //  Create a graphic so you can see the bounds
+    // var buttonGraphics = game.add.graphics(buttonBounds.x, buttonBounds.y);
+    // buttonGraphics.beginFill(0x333333);
+    // buttonGraphics.drawRect(0, 0, buttonBounds.width, buttonBounds.height);
+    // game.physics.arcade.enableBody(buttonBounds);
+    // buttonBounds.immovable = true;
+
+
+    //var ground1 = game.add.sprite(0, 530, 'ground');
+    //var ground2 = game.add.sprite(0, 30, 'ground');
 
     player = game.add.sprite(10, 400, 'dude');
     game.physics.arcade.enableBody(player);
+
+    // player.inputEnabled = true;
+    // player.input.boundsRect = bounds;
+
     player.body.gravity.y = 350;
+    // player.body.allowGravity = false;
+    // player.body.immovable = true;
 
     player.body.bounce.y = 0.1;
     player.body.collideWorldBounds = true;
@@ -261,13 +360,21 @@ function create() {
     player.animations.add('turn', [4], 20, true);
     player.animations.add('right', [5, 6, 7, 8], 10, true);
 
+    numGroup = game.add.group();
+    numGroup.inputEnableChildren = true;
+    numGroup.onChildInputDown.priorityID = 1000;
+    numGroup.onChildInputDown.add(numDonw, this);
+
     loadSite();
 }
 
+
 function update() {
+    game.physics.arcade.collide(player, bottomGround);
+    game.physics.arcade.collide(player, ground);
     game.physics.arcade.collide(player, flag, touchFlag);
     game.physics.arcade.collide(player, rects, impact);
-    game.physics.arcade.collide(player, button);
+    //game.physics.arcade.collide(player, button);
     game.physics.arcade.overlap(player, stars, collectStar, null, this);
     //player.body.velocity.x = 0;
 
@@ -307,10 +414,10 @@ function collectStar(player, star) {
 function touchFlag() {
     flag.destroy();
     if (stars.total == 0) {
-        console.log("congratulation!");
-        player.body.velocity.x = 0;
+        //console.log("congratulation!");
+        //player.body.velocity.x = 0;
     } else {
-        console.log("you must collect all the starts before get the flag!");
+        //console.log("you must collect all the starts before get the flag!");
         var style = {
             font: "30px Arial",
             fill: "#66CCFF",
@@ -402,14 +509,16 @@ function buildAndRun() {
     //player.stopVelocity();
     player.body.velocity.set(0, 0);
     if (state == 'run') {
+        player.body.immovable = false;
+        player.body.allowGravity = true;
         //run模式
         //console.log('run');
         rects.ignoreChildInput = true;
         //rects.enableBody = true;
 
-        player.body.velocity.x = 150;
+        //player.body.velocity.x = 150;
         button.loadTexture('build', 0);
-        putStarsandBlocks();
+        putStarsandBlocks(currentSite);
         state = 'build';
         return;
 
@@ -417,13 +526,15 @@ function buildAndRun() {
 
 
     if (state == 'build') {
+        player.body.immovable = true;
+        player.body.allowGravity = false;
         //build模式
         //console.log('build');
         rects.ignoreChildInput = false;
         //rects.enableBody = false;
         //player.body.immovable = true;
         button.loadTexture('run', 0);
-        putStarsandBlocks();
+        putStarsandBlocks(currentSite);
 
         state = 'run';
         return;
@@ -434,29 +545,39 @@ function resetPlayer() {
     location.reload();
 }
 
-function putStarsandBlocks() {
+function putStarsandBlocks(siteNum) {
     stars.enableBody = true;
 
     if (flag.visible == false) {
-        flag = game.add.sprite(data[currentSite - 1].flag.x, data[currentSite - 1].flag.y, 'flag');
+        flag = game.add.sprite(data[siteNum - 1].flag.x, data[siteNum - 1].flag.y, 'flag');
         game.physics.arcade.enableBody(flag);
         //flag.body.mess = 0;
     }
 
     // 148 25  411 185
-    for (var i = 0; i < data[currentSite - 1].stars.length; i++) {
-        var s = stars.create(data[currentSite - 1].stars[i].x, data[currentSite - 1].stars[i].y, 'star');
+    for (var i = 0; i < data[siteNum - 1].stars.length; i++) {
+        var s = stars.create(data[siteNum - 1].stars[i].x, data[siteNum - 1].stars[i].y, 'star');
     }
 
     //blocks.enableBody = true;
-    for (var i = 0; i < data[currentSite - 1].blocks.length; i++) {
-        var b = rects.create(data[currentSite - 1].blocks[i].x, data[currentSite - 1].blocks[i].y, 'block' + data[currentSite - 1].blocks[i].index);
-        b.name = 'brick' + data[currentSite - 1].blocks[i].index;
+    //rects.inputEnabled = true;
+    for (var i = 0; i < data[siteNum - 1].blocks.length; i++) {
+        var b = rects.create(data[siteNum - 1].blocks[i].x, data[siteNum - 1].blocks[i].y, 'block' + data[siteNum - 1].blocks[i].index);
+        b.name = 'brick' + data[siteNum - 1].blocks[i].index;
         b.body.immovable = true;
     }
+    //rects.input.boundsRect = bounds;
+
 }
 
-function loadSite() {
+function loadSite(siteNum) {
+    var dataNum;
+    //bounds = new Phaser.Rectangle(0, game.height * 0.85, game.width, game.height * 0.15);
+    if (siteNum) {
+        dataNum = siteNum;
+    } else {
+        dataNum = currentSite;
+    }
 
     // if (rects)
     //     rects.destroy();
@@ -465,41 +586,54 @@ function loadSite() {
 
     //flag.reset(data[currentSite - 1].flag.x, data[currentSite - 1].flag.y);
     //button.reset(data[currentSite - 1].button.x, data[currentSite - 1].button.y);
-    flag = game.add.sprite(data[currentSite - 1].flag.x, data[currentSite - 1].flag.y, 'flag');
+    flag = game.add.sprite(data[dataNum - 1].flag.x, data[dataNum - 1].flag.y, 'flag');
     game.physics.arcade.enableBody(flag);
     //flag.body.mess = 0;
 
 
-    button = game.add.sprite(data[currentSite - 1].button.x, data[currentSite - 1].button.y, 'run');
-    game.physics.arcade.enableBody(button);
-    button.body.immovable = true;
-    button.inputEnabled = true;
-    button.events.onInputDown.add(buildAndRun);
 
-    player.reset(data[currentSite - 1].player.x, data[currentSite - 1].player.y);
+    player.reset(data[dataNum - 1].player.x, data[dataNum - 1].player.y);
     player.visible = true;
+    player.body.immovable = true;
+    player.body.allowGravity = false;
+    //player.input.boundsRect = bounds;
 
     rects = game.add.group();
     rects.enableBody = true;
-    for (var i = 0; i < data[currentSite - 1].bricks.length; i++) {
-        var r = rects.create(game.width / (data[currentSite - 1].bricks.length + 1) * (i + 1), 20, 'brick' + data[currentSite - 1].bricks[i].index);
+    //放下brick
+    for (var i = 0; i < data[dataNum - 1].bricks.length; i++) {
+        var r = rects.create(game.width / (data[dataNum - 1].bricks.length + 1) * (i + 1), game.height * 0.05, 'brick' + data[dataNum - 1].bricks[i].index);
         r.anchor.set(0.5);
-        r.name = 'brick' + data[currentSite - 1].bricks[i].index;
+        r.name = 'brick' + data[dataNum - 1].bricks[i].index;
         r.body.immovable = true;
+
         r.inputEnabled = true;
+        r.input.enableSnap(4, 4, true, true);
         r.input.enableDrag();
+        r.input.boundsRect = bounds;
+        //r.input.boundsRect = bounds;
 
     }
 
     stars = game.add.group();
-    putStarsandBlocks();
-
-
+    putStarsandBlocks(dataNum);
 
 }
 
 function startNextStage() {
     currentSite++;
+    // player.body.immovable = true;
+    // player.body.allowGravity = false;
+    //rects.ignoreChildInput = false;
+    //rects.enableBody = false;
+    //player.body.immovable = true;
+    if (localStorage.getItem("reached-level") == null || (currentSite > parseInt(localStorage.getItem("reached-level")))) {
+        localStorage.setItem("reached-level", currentSite);
+    }
+    //console.log(localStorage.getItem("reached-level"));
+    button.loadTexture('run', 0);
+    state = 'run';
+
     text.destroy();
     loadSite();
 }
@@ -509,11 +643,129 @@ function clearSite() {
         rects.destroy();
     if (stars)
         stars.destroy();
-    if (button)
-        button.destroy();
+    // if (button)
+    //     button.destroy();
     if (flag)
         flag.destroy();
-    player.visible = false;
+    //player.visible = false;
+}
+
+function checkSite() {
+    // headWindow = game.add.sprite(0, game.height, 'ground');
+    // headWindow.scale.setTo(2, 6);
+
+    // var tween = game.add.tween(headWindow);
+    // tween.to({
+    //     y: game.height * 0.9
+    // }, 1000, "Linear", true);
+    if (headWindowTween) {
+        headWindowTween.to({
+            y: 0
+        }, 300, "Linear", true);
+        headWindowTween = null;
+    } else {
+
+        headWindow = game.add.sprite(0, 0, 'ground');
+        headWindow.anchor.y = 1;
+        //headWindow.scale.setTo(2, 6);
+
+        //var lastLine = Math.ceil(parseInt(localStorage.getItem("reached-level")) / 10);
+        var lastLine = Math.ceil(data.length / 10);
+        var highestLevel = parseInt(localStorage.getItem("reached-level"));
+        //console.log(highestLevel);
+        var currentNum = 1;
+        var lastLineNumber = data.length % 10 == 0 ? 10 : data.length % 10;
+
+        //console.log(data.length);
+        //console.log(lastLineNumber);
+        //console.log(lastLine);
+        for (var i = 0; i < lastLine; i++) {
+            for (var j = 0; j < 10; j++) {
+                // if (i == (lastLine - 1) && j + 1 > lastLineNumber)
+                //     break;
+                //console.log(currentNum);
+                var color = currentNum > highestLevel ? "#808080" : "#000000";
+                var font = '30px Arial';
+                if (currentNum == currentSite)
+                    font = '40px Arial';
+                var style = {
+                    font: font,
+                    fill: color,
+                    align: "center"
+                };
+                //console.log(style);
+                var num = (i == (lastLine - 1) ? lastLineNumber : 10);
+                //console.log(j);
+                // var num = game.add.text(0, 0, j, style);
+                // num.alignIn(headWindow, Phaser.TOP_CENTER, -i * game.height * 0.01, -j * game.width * 0.01);
+
+                //var num = numGroup.create(data[currentSite - 1].stars[i].x, data[currentSite - 1].stars[i].y, 'star');
+                // console.log('~~~~~~~~~~~~~~');
+                //var num = game.add.text(j * 80 + 50, 100, j + 1, style);
+
+
+                var numText = new Phaser.Text(game, game.width / (num + 1) * (j + 1), -25, currentNum, style);
+                //var numText = numGroup.createText(game ,game.width / (num + 1) * (j + 1), -25, currentNum, style);
+                numText.anchor.y = 1;
+                numGroup.addChild(numText);
+                numText.inputEnabled = true;
+                numText.priorityID = 5;
+                numText.events.onInputUp.add(numDonw, this);
+                headWindow.addChild(numText);
+                currentNum++;
+                //var numText = game.add.text(game.width / (num + 1) * (j + 1), 120, j + 1, style);
+
+
+                //num.alignIn(headWindow, Phaser.TOP_CENTER, -i * game.height * 0.01, -j * game.width * 0.01);
+            }
+        }
+
+
+        headWindowTween = game.add.tween(headWindow);
+        headWindowTween.to({
+            y: game.height * 0.15
+        }, 300, "Linear", true);
+
+        game.input.onDown.addOnce(packUpHeadWindow);
+
+    }
+
+
+    // console.log(localStorage.getItem("reached-level"));
+    // console.log(currentSite);
+    //tween.onComplete.add(startNextStage);
+
+    // ground = game.add.sprite(0, game.height * 0.9, 'ground');
+    // ground.scale.setTo(2, 6);
+    // game.physics.arcade.enableBody(ground);
+    // ground.body.immovable = true;
+    // console.log('111111111111111111111111111111111');
+}
+
+function numDonw(siteNum) {
+    game.input.onDown.remove(packUpHeadWindow);
+    headWindowTween.to({
+        y: 0
+    }, 300, "Linear", true);
+    headWindowTween.onComplete.add(tweenFinish, this, null, parseInt(siteNum.text));
+    headWindowTween = null;
+    // clearSite();
+    // loadSite(parseInt(siteNum.text));
+}
+
+function tweenFinish(a, b, num) {
+    clearSite();
+    loadSite(num);
+    currentSite = num;
+}
+
+function packUpHeadWindow() {
+    if(headWindowTween.isRunning)
+        return;
+    headWindowTween.to({
+        y: 0
+    }, 300, "Linear", true);
+    headWindowTween = null;
 }
 // function pickTile(sprite, pointer) {
 
