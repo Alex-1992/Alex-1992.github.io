@@ -29,34 +29,24 @@ var numGroup;
 var data = [{
     //stage 1
     stars: [{
-        x: 430,
-        y: 300
+        x: 360,
+        y: 220
     }],
 
-    blocks: [{
-        index: 4,
-        x: 200,
-        y: 400
-    }],
+    blocks: [],
 
     bricks: [{
-        index: 3,
-        x: 200,
-        y: 450
-    }, {
         index: 4,
-        x: 200,
-        y: 450
     }],
 
     player: {
-        x: 200,
-        y: 350
+        x: 300,
+        y: 200
     },
 
     flag: {
-        x: 550,
-        y: 350
+        x: 450,
+        y: 220
     }
     //stage 2
 }, {
@@ -73,6 +63,8 @@ var data = [{
 
     bricks: [{
         index: 3,
+    }, {
+        index: 4,
         x: 200,
         y: 450
     }],
@@ -83,10 +75,36 @@ var data = [{
     },
 
     flag: {
-        x: 550,
+        x: 560,
         y: 350
     }
     //stage 3
+}, {
+    stars: [{
+        x: 430,
+        y: 300
+    }],
+
+    blocks: [{
+        index: 4,
+        x: 200,
+        y: 400
+    }],
+
+    bricks: [{
+        index: 3,
+    }],
+
+    player: {
+        x: 200,
+        y: 350
+    },
+
+    flag: {
+        x: 560,
+        y: 350
+    }
+    //stage 4
 }, {
     stars: [{
         x: 450,
@@ -115,20 +133,12 @@ var data = [{
 
     bricks: [{
         index: 0,
-        x: 550,
-        y: 380
     }, {
         index: 1,
-        x: 200,
-        y: 300
     }, {
         index: 3,
-        x: 100,
-        y: 450
     }, {
         index: 4,
-        x: 100,
-        y: 450
     }],
 
     player: {
@@ -140,7 +150,7 @@ var data = [{
         x: 400,
         y: 340
     }
-    //stage 4
+    //stage 5
 }, {
     stars: [{
         x: 400,
@@ -168,16 +178,10 @@ var data = [{
 
     bricks: [{
         index: 0,
-        x: 550,
-        y: 380
     }, {
         index: 1,
-        x: 200,
-        y: 300
     }, {
         index: 3,
-        x: 100,
-        y: 450
     }],
 
     player: {
@@ -193,7 +197,7 @@ var data = [{
         y: 380
     }
 }, {
-    //stage 5
+    //stage 6
     stars: [{
         x: 550,
         y: 200
@@ -221,16 +225,10 @@ var data = [{
 
     bricks: [{
         index: 0,
-        x: 550,
-        y: 380
     }, {
         index: 1,
-        x: 200,
-        y: 300
     }, {
         index: 2,
-        x: 100,
-        y: 450
     }],
 
     player: {
@@ -245,7 +243,7 @@ var data = [{
         x: 370,
         y: 380
     }
-}, {}, {}, {}, {}, {}];
+}, {}, {}, {}, {}];
 
 function preload() {
     game.load.spritesheet('block0', 'png/block0.png', 64, 32);
@@ -416,6 +414,28 @@ function touchFlag() {
     if (stars.total == 0) {
         //console.log("congratulation!");
         //player.body.velocity.x = 0;
+        button.events.onInputDown.remove(buildAndRun);
+
+        var style = {
+            font: "55px Arial",
+            fill: "#FFFFCC",
+            align: "center"
+        };
+        text = game.add.text(game.world.centerX, game.world.centerY, "- walkman -\nstage " + (currentSite + 1), style);
+        text.anchor.set(0.5);
+        text.alpha = 1;
+
+        var tween = game.add.tween(text);
+        tween.to({
+            alpha: 0.1
+        }, 2500, "Linear", true);
+
+
+
+        tween.onComplete.add(startNextStage);
+
+        clearSite();
+
     } else {
         //console.log("you must collect all the starts before get the flag!");
         var style = {
@@ -437,22 +457,7 @@ function touchFlag() {
         return;
     }
 
-    var style = {
-        font: "55px Arial",
-        fill: "#FFFFCC",
-        align: "center"
-    };
-    text = game.add.text(game.world.centerX, game.world.centerY, "- walkman -\nstage " + (currentSite + 1), style);
-    text.anchor.set(0.5);
-    text.alpha = 1;
 
-    var tween = game.add.tween(text);
-    tween.to({
-        alpha: 0.1
-    }, 2500, "Linear", true);
-    tween.onComplete.add(startNextStage);
-
-    clearSite();
 
     //alert('congratulation!');
 }
@@ -503,6 +508,15 @@ function impact(dis, dis2) {
 }
 
 function buildAndRun() {
+    if (headWindowTween) {
+        headWindowTween.to({
+            y: 0
+        }, 300, "Linear", true);
+        headWindowTween = null;
+
+        game.input.onDown.remove(packUpHeadWindow);
+    }
+
     player.x = data[currentSite - 1].player.x;
     player.y = data[currentSite - 1].player.y;
     //player.body.reset(10, 400);
@@ -635,6 +649,9 @@ function startNextStage() {
     state = 'run';
 
     text.destroy();
+
+    button.events.onInputDown.add(buildAndRun);
+
     loadSite();
 }
 
@@ -659,10 +676,12 @@ function checkSite() {
     //     y: game.height * 0.9
     // }, 1000, "Linear", true);
     if (headWindowTween) {
+        console.log('收起');
         headWindowTween.to({
             y: 0
         }, 300, "Linear", true);
         headWindowTween = null;
+        game.input.onDown.remove(packUpHeadWindow);
     } else {
 
         headWindow = game.add.sprite(0, 0, 'ground');
@@ -720,13 +739,13 @@ function checkSite() {
             }
         }
 
-
+        console.log('放下');
         headWindowTween = game.add.tween(headWindow);
         headWindowTween.to({
             y: game.height * 0.15
         }, 300, "Linear", true);
 
-        game.input.onDown.addOnce(packUpHeadWindow);
+        game.input.onDown.add(packUpHeadWindow);
 
     }
 
@@ -743,7 +762,6 @@ function checkSite() {
 }
 
 function numDonw(siteNum) {
-    game.input.onDown.remove(packUpHeadWindow);
     headWindowTween.to({
         y: 0
     }, 300, "Linear", true);
@@ -760,12 +778,18 @@ function tweenFinish(a, b, num) {
 }
 
 function packUpHeadWindow() {
-    if(headWindowTween.isRunning)
-        return;
-    headWindowTween.to({
-        y: 0
-    }, 300, "Linear", true);
-    headWindowTween = null;
+
+
+    if (game.input.activePointer.y > game.height * 0.15 && game.input.activePointer.y < game.height * 0.9) {
+        headWindowTween.to({
+            y: 0
+        }, 300, "Linear", true);
+        headWindowTween = null;
+
+        game.input.onDown.remove(packUpHeadWindow);
+    }
+
+    //console.log(game.input.activePointer.x, game.input.activePointer.y);
 }
 // function pickTile(sprite, pointer) {
 
