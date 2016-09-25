@@ -778,7 +778,10 @@ function tweenFinish(a, b, num) {
 }
 
 function packUpHeadWindow() {
-
+    if(!headWindowTween){
+        game.input.onDown.remove(packUpHeadWindow);
+        return;
+    }
 
     if (game.input.activePointer.y > game.height * 0.15 && game.input.activePointer.y < game.height * 0.9) {
         headWindowTween.to({
