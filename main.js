@@ -18,7 +18,7 @@ var state = 'run';
 var text;
 var bounds;
 var bottomGround;
-var currentSite = 1;
+var currentSite = 2;
 var ground;
 var graphicsGround;
 var headWindow;
@@ -373,13 +373,12 @@ function create() {
 
 function update() {
     game.physics.arcade.collide(player, bottomGround);
-    game.physics.arcade.collide(player, ground);
-    game.physics.arcade.collide(player, flag, touchFlag);
-    game.physics.arcade.collide(player, rects, impact);
+    //game.physics.arcade.collide(player, ground);
+    game.physics.arcade.collide(player, flag, playerTouchFlag);
+    game.physics.arcade.collide(player, rects, playerTouchBrick);
     //game.physics.arcade.collide(player, button);
     game.physics.arcade.overlap(player, stars, collectStar, null, this);
 
-    game.physics.arcade.collide(rects, stars);
     //player.body.velocity.x = 0;
 
     if (player.body.velocity.x > 0) {
@@ -415,7 +414,7 @@ function collectStar(player, star) {
     star.destroy();
 }
 
-function touchFlag() {
+function playerTouchFlag() {
     flag.destroy();
     if (stars.total == 0) {
         //console.log("congratulation!");
@@ -469,8 +468,8 @@ function touchFlag() {
     //alert('congratulation!');
 }
 
-function impact(dis, dis2) {
-    //console.log("impact"+state);
+function playerTouchBrick(dis, dis2) {
+    //console.log("playerTouchBrick"+state);
     if (state == 'run') {
         return;
     }
@@ -622,7 +621,14 @@ function loadSite(siteNum) {
     rects.enableBody = true;
     //放下brick
     for (var i = 0; i < data[dataNum - 1].bricks.length; i++) {
-        var r = rects.create(game.width / (data[dataNum - 1].bricks.length + 1) * (i + 1), game.height * 0.05, 'brick' + data[dataNum - 1].bricks[i].index);
+        var x = game.width / (data[dataNum - 1].bricks.length + 1) * (i + 1);
+        var y = game.height * 0.05;
+        // data[dataNum - 1].bricks[i].x = x;
+        // data[dataNum - 1].bricks[i].y = y;
+       
+        var r = rects.create(x, y, 'brick' + data[dataNum - 1].bricks[i].index);
+        r.data.x = x;
+        r.data.y = y;
         r.anchor.set(0.5);
         r.name = 'brick' + data[dataNum - 1].bricks[i].index;
         r.body.immovable = true;
@@ -631,10 +637,12 @@ function loadSite(siteNum) {
         r.input.enableSnap(4, 4, true, true);
         r.input.enableDrag();
         r.input.boundsRect = bounds;
+        r.events.onDragUpdate.add(dragUpdate);
+        r.events.onDragStop.add(dragStop);
         //r.input.boundsRect = bounds;
 
     }
-
+    //console.log(data);
     stars = game.add.group();
     putStarsandBlocks(dataNum);
 
@@ -803,6 +811,49 @@ function packUpHeadWindow() {
     }
 
     //console.log(game.input.activePointer.x, game.input.activePointer.y);
+}
+
+
+function dragUpdate(target){
+    target.alpha = 1;
+    game.physics.arcade.overlap(target, rects, function(){
+        target.alpha = 0.5;
+    });
+    game.physics.arcade.overlap(target, flag, function(){
+        target.alpha = 0.5;
+    });
+    game.physics.arcade.overlap(target, stars, function(){
+        target.alpha = 0.5;
+    });
+    game.physics.arcade.overlap(target, player, function(){
+        target.alpha = 0.5;
+    });
+}
+
+function dragStop(target){
+
+    if(target.alpha != 1){
+        
+        game.add.tween(target).to( {x:target.data.x, y:target.data.y }, 500, null, true);
+        target.alpha = 1;
+        var style = {
+            font: "30px Arial",
+            fill: "#66CCFF",
+            align: "center"
+        };
+        var info = game.add.text(game.world.centerX, game.world.centerY, " bricks can not overlap with other things! ", style);
+        info.anchor.set(0.5);
+        info.alpha = 1;
+
+        var infotween = game.add.tween(info);
+        infotween.to({
+            alpha: 0.5
+        }, 1500, "Linear", true);
+        infotween.onComplete.add(function() {
+            info.destroy();
+            // target.alpha = 1;
+        });
+    }
 }
 // function pickTile(sprite, pointer) {
 

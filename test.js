@@ -23,6 +23,8 @@ function create() {
     brick.inputEnabled = true;
     brick.input.enableDrag();
     game.physics.arcade.enableBody(brick);
+    brick.events.onDragUpdate.add(callback);
+    brick.events.onDragStop.add(dragStop);
     // brick.body.blocked.up = true;
     // brick.body.blocked.down = true;
     //hander = new Phaser.InputHandler(brick);
@@ -37,13 +39,56 @@ function create() {
 
 function update() {
 
-    game.physics.arcade.overlap(brick, block, testImpact);
+    //game.physics.arcade.overlap(brick, block, testImpact);
 
 }
 
-function testImpact(target) {
-    console.log(target);
+function testImpact(target1, target2) {
+    //target1.events.onDragUpdate.add(callback, this, 0, 'lazer', 100);
+    // console.log(target);
+    // console.log(target.body.overlapX,target.body.overlapY);
+    target1.alpha = 0.5;
     console.log('Impact');
+    // if( target1.position.x > target2.position.x - 96){
+    //     target1.position.x = target2.position.x - 96;
+    // }
+    // if( target1.position.y > target2.position.y - 16){
+    //     target1.position.y = target2.position.y - 16;
+    // }
+    // console.log(target1.position.x,target1.position.y);
+    // console.log(target1.body.prev);
+    // target1.position.x = target1.body.prev.x;
+    // target1.position.y = target1.body.prev.y;
+    
+    //target1.body.x 
+
+
     //console.log(target.body);
     //hander.stopDrag(game.input.activePointer);
+    // console.log(target.body);
+    // hander.stopDrag(game.input.activePointer);
+}
+function callback(aa){
+    aa.alpha = 1;
+    game.physics.arcade.overlap(brick, block, testImpact);
+    //console.log('aaaaaaaaaaaaaaaaaaaaaa')
+    console.log(arguments);
+    // console.log('999999999999999999999999999999999999999999999999')
+    // console.log(aa)
+    // console.log(target)
+    // console.log(bb)
+    //console.log(target.body.touching);
+    // if(target.body.touching == 'none'){
+    // console.log('11111111111111111111111111')
+        
+    //     target.events.onDragUpdate.remove(callback);
+    //     target.alpha = 1;
+    // }else{
+    //     target.alpha = 0.5;
+    // }
+}
+
+function dragStop(a){
+    console.log('aaaaaaaa')
+    console.log(a.alpha)
 }
