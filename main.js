@@ -171,15 +171,19 @@ var data = [{
         x: 550,
         y: 450
     }, {
+        index: 4,
+        x: 300,
+        y: 100
+    }, {
         index: 1,
         x: 580,
         y: 300
     }],
 
     bricks: [{
-        index: 0,
+        index: 3,
     }, {
-        index: 1,
+        index: 0,
     }, {
         index: 3,
     }],
@@ -374,6 +378,8 @@ function update() {
     game.physics.arcade.collide(player, rects, impact);
     //game.physics.arcade.collide(player, button);
     game.physics.arcade.overlap(player, stars, collectStar, null, this);
+
+    game.physics.arcade.collide(rects, stars);
     //player.body.velocity.x = 0;
 
     if (player.body.velocity.x > 0) {
@@ -415,6 +421,7 @@ function touchFlag() {
         //console.log("congratulation!");
         //player.body.velocity.x = 0;
         button.events.onInputDown.remove(buildAndRun);
+        recordsBtn.events.onInputDown.remove(checkSite);
 
         var style = {
             font: "55px Arial",
@@ -513,8 +520,7 @@ function buildAndRun() {
             y: 0
         }, 300, "Linear", true);
         headWindowTween = null;
-
-        game.input.onDown.remove(packUpHeadWindow);
+        //game.input.onDown.remove(packUpHeadWindow);
     }
 
     player.x = data[currentSite - 1].player.x;
@@ -651,6 +657,7 @@ function startNextStage() {
     text.destroy();
 
     button.events.onInputDown.add(buildAndRun);
+    recordsBtn.events.onInputDown.add(checkSite);
 
     loadSite();
 }
@@ -681,7 +688,7 @@ function checkSite() {
             y: 0
         }, 300, "Linear", true);
         headWindowTween = null;
-        game.input.onDown.remove(packUpHeadWindow);
+        //game.input.onDown.remove(packUpHeadWindow);
     } else {
 
         headWindow = game.add.sprite(0, 0, 'ground');
@@ -762,6 +769,9 @@ function checkSite() {
 }
 
 function numDonw(siteNum) {
+    if (parseInt(siteNum.text) > parseInt(localStorage.getItem("reached-level")))
+        return;
+    //game.input.onDown.remove(packUpHeadWindow);
     headWindowTween.to({
         y: 0
     }, 300, "Linear", true);
@@ -778,7 +788,10 @@ function tweenFinish(a, b, num) {
 }
 
 function packUpHeadWindow() {
-
+    if(!headWindowTween){
+        game.input.onDown.remove(packUpHeadWindow);
+        return;
+    }
 
     if (game.input.activePointer.y > game.height * 0.15 && game.input.activePointer.y < game.height * 0.9) {
         headWindowTween.to({
