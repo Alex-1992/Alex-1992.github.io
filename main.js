@@ -18,7 +18,7 @@ var state = 'run';
 var text;
 var bounds;
 var bottomGround;
-var currentSite = 2;
+var currentSite = 5;
 var ground;
 var graphicsGround;
 var headWindow;
@@ -168,15 +168,15 @@ var data = [{
 
     blocks: [{
         index: 1,
-        x: 550,
-        y: 450
+        x: 580,
+        y: 430
     }, {
         index: 4,
-        x: 300,
+        x: 320,
         y: 100
     }, {
         index: 1,
-        x: 580,
+        x: 600,
         y: 300
     }],
 
@@ -189,7 +189,7 @@ var data = [{
     }],
 
     player: {
-        x: 310,
+        x: 330,
         y: 50
     },
     button: {
@@ -250,22 +250,22 @@ var data = [{
 }, {}, {}, {}, {}];
 
 function preload() {
-    game.load.spritesheet('block0', 'png/block0.png', 64, 32);
-    game.load.spritesheet('block1', 'png/block1.png', 64, 32);
-    game.load.spritesheet('block2', 'png/block2.png', 64, 32);
-    game.load.spritesheet('block3', 'png/block3.png', 64, 32);
-    game.load.spritesheet('block4', 'png/block4.png', 64, 32);
+    game.load.spritesheet('block0', 'png/block0.png', 96, 32);
+    game.load.spritesheet('block1', 'png/block1.png', 96, 32);
+    game.load.spritesheet('block2', 'png/block2.png', 96, 32);
+    game.load.spritesheet('block3', 'png/block3.png', 96, 32);
+    game.load.spritesheet('block4', 'png/block4.png', 96, 32);
 
     game.load.spritesheet('dude', 'png/dude.png', 32, 48);
 
-    game.load.spritesheet('brick0', 'png/brick0.png', 64, 32);
-    game.load.spritesheet('brick1', 'png/brick1.png', 64, 32);
-    game.load.spritesheet('brick2', 'png/brick2.png', 64, 32);
-    game.load.spritesheet('brick3', 'png/brick3.png', 64, 32);
-    game.load.spritesheet('brick4', 'png/brick4.png', 64, 32);
+    game.load.spritesheet('brick0', 'png/brick0.png', 96, 32);
+    game.load.spritesheet('brick1', 'png/brick1.png', 96, 32);
+    game.load.spritesheet('brick2', 'png/brick2.png', 96, 32);
+    game.load.spritesheet('brick3', 'png/brick3.png', 96, 32);
+    game.load.spritesheet('brick4', 'png/brick4.png', 96, 32);
 
-    game.load.spritesheet('star', 'png/star.png', 64, 32);
-    game.load.spritesheet('start', 'png/start.png', 64, 32);
+    game.load.spritesheet('star', 'png/star.png', 96, 32);
+    game.load.spritesheet('start', 'png/start.png', 96, 32);
     game.load.spritesheet('flag', 'png/flag.png', 28, 32);
 
     // game.load.spritesheet('build', 'png/build.png', 124, 50);
@@ -279,6 +279,7 @@ function preload() {
 }
 
 function create() {
+    startMovie(game);
     //console.log(localStorage.getItem("reached-level"));
     game.physics.startSystem(Phaser.Physics.ARCADE);
     //game.stage.backgroundColor = 'blank';
@@ -622,7 +623,7 @@ function loadSite(siteNum) {
     //放下brick
     for (var i = 0; i < data[dataNum - 1].bricks.length; i++) {
         var x = game.width / (data[dataNum - 1].bricks.length + 1) * (i + 1);
-        var y = game.height * 0.05;
+        var y = game.height * 0.06;
         // data[dataNum - 1].bricks[i].x = x;
         // data[dataNum - 1].bricks[i].y = y;
        
