@@ -272,8 +272,8 @@ function preload() {
     // game.load.spritesheet('run', 'png/run.png', 124, 50);
     game.load.spritesheet('ground', 'png/ground.png', 1000, 900);
 
-    game.load.spritesheet('build', 'png/build1.png', 124, 50);
-    game.load.spritesheet('run', 'png/run1.png', 124, 50);
+    game.load.spritesheet('build', 'png/build10.png', 108, 56);
+    game.load.spritesheet('run', 'png/run10.png', 108, 56);
     game.load.spritesheet('recordsBtn', 'png/records.png', 124, 50);
 
 }
@@ -300,38 +300,38 @@ function create() {
     graphics.drawRect(0, 0, bounds.width, bounds.height);
     graphics.endFill();
     game.physics.arcade.enableBody(bounds);
-    //bounds.immovable = true;
+    
 
-    // ground = game.add.sprite(0, game.height * 0.9, 'ground');
-    // //ground.scale.setTo(2, 6);
-    // game.physics.arcade.enableBody(ground);
-    // ground.body.immovable = true;
+    //底部挡板
+    // var graphicsGround = new Phaser.Graphics(this.game, 0, 0);
+    // graphicsGround.beginFill(0xC3C3C3);
+    // graphicsGround.drawRect(0, 0, game.width, game.height * 0.1);
+    // graphicsGround.endFill();
+    // bottomGround = game.add.sprite(0, game.height * 0.9, graphicsGround.generateTexture());
 
-    var graphicsGround = new Phaser.Graphics(this.game, 0, 0);
-    graphicsGround.beginFill(0xC3C3C3);
-    graphicsGround.drawRect(0, 0, game.width, game.height * 0.1);
-    graphicsGround.endFill();
-    bottomGround = game.add.sprite(0, game.height * 0.9, graphicsGround.generateTexture());
-
-    game.physics.arcade.enableBody(bottomGround);
-    bottomGround.body.immovable = true;
+    // game.physics.arcade.enableBody(bottomGround);
+    // bottomGround.body.immovable = true;
 
     //graphics1.drawRect(0, 0, 100, 100);
 
 
-    button = game.add.sprite(game.width / 3, game.height * 0.92, 'run');
+    button = game.add.sprite(game.width / 3, game.height * 0.9, 'run');
     button.anchor.x = 0.5;
     // game.physics.arcade.enableBody(button);
     // button.body.immovable = true;
     button.inputEnabled = true;
     button.events.onInputDown.add(buildAndRun);
+    game.physics.arcade.enableBody(button);
+    button.body.immovable = true;
 
 
-    recordsBtn = game.add.sprite(game.width / 3 * 2, game.height * 0.92, 'recordsBtn');
+    recordsBtn = game.add.sprite(game.width / 3 * 2, game.height * 0.9, 'recordsBtn');
     recordsBtn.anchor.x = 0.5;
-
+    //recordsBtn.index = 10;
     recordsBtn.inputEnabled = true;
     recordsBtn.events.onInputDown.add(checkSite);
+    game.physics.arcade.enableBody(recordsBtn);
+    recordsBtn.body.immovable = true;
     // buttonBounds = new Phaser.Rectangle(0, game.height * 0.85, game.width, game.height * 0.15);
     // //  Create a graphic so you can see the bounds
     // var buttonGraphics = game.add.graphics(buttonBounds.x, buttonBounds.y);
@@ -378,7 +378,10 @@ function update() {
     game.physics.arcade.collide(player, rects, playerTouchBrick);
     //game.physics.arcade.collide(player, button);
     game.physics.arcade.overlap(player, stars, collectStar, null, this);
+    game.physics.arcade.collide(player, button);
+    game.physics.arcade.collide(player, recordsBtn);
 
+    
     //player.body.velocity.x = 0;
 
     if (player.body.velocity.x > 0) {
