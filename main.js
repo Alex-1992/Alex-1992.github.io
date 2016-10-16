@@ -250,6 +250,31 @@ var data = [{
 }, {}, {}, {}, {}];
 
 function preload() {
+    // game.load.spritesheet('block0', 'block0.png', 64, 32);
+    // game.load.spritesheet('block1', 'block1.png', 64, 32);
+    // game.load.spritesheet('block2', 'block2.png', 64, 32);
+    // game.load.spritesheet('block3', 'block3.png', 64, 32);
+    // game.load.spritesheet('block4', 'block4.png', 64, 32);
+
+    // game.load.spritesheet('dude', 'dude.png', 32, 48);
+
+    // game.load.spritesheet('brick0', 'brick0.png', 64, 32);
+    // game.load.spritesheet('brick1', 'brick1.png', 64, 32);
+    // game.load.spritesheet('brick2', 'brick2.png', 64, 32);
+    // game.load.spritesheet('brick3', 'brick3.png', 64, 32)
+    // game.load.spritesheet('brick4', 'brick4.png', 64, 32);
+
+    // game.load.spritesheet('star', 'star.png', 64, 32);
+    // game.load.spritesheet('start', 'start.png', 64, 32);
+    // game.load.spritesheet('flag', 'flag.png', 28, 32);
+
+    // game.load.spritesheet('ground', 'ground.png', 1000, 900);
+
+    // game.load.spritesheet('build', 'build10.png', 108, 56);
+    // game.load.spritesheet('run', 'run10.png', 108, 56);
+    // game.load.spritesheet('recordsBtn', 'records.png', 124, 50);
+
+
     game.load.spritesheet('block0', 'png/block0.png', 64, 32);
     game.load.spritesheet('block1', 'png/block1.png', 64, 32);
     game.load.spritesheet('block2', 'png/block2.png', 64, 32);
@@ -268,8 +293,6 @@ function preload() {
     game.load.spritesheet('start', 'png/start.png', 64, 32);
     game.load.spritesheet('flag', 'png/flag.png', 28, 32);
 
-    // game.load.spritesheet('build', 'png/build.png', 124, 50);
-    // game.load.spritesheet('run', 'png/run.png', 124, 50);
     game.load.spritesheet('ground', 'png/ground.png', 1000, 900);
 
     game.load.spritesheet('build', 'png/build10.png', 108, 56);
@@ -315,22 +338,24 @@ function create() {
     //graphics1.drawRect(0, 0, 100, 100);
 
 
-    button = game.add.sprite(game.width / 3, game.height * 0.9, 'run');
+    button = game.add.sprite(game.width / 3, game.height * 0.93, 'run');
     button.anchor.x = 0.5;
     // game.physics.arcade.enableBody(button);
     // button.body.immovable = true;
     button.inputEnabled = true;
     button.events.onInputDown.add(buildAndRun);
     game.physics.arcade.enableBody(button);
+    button.scale.setTo(0.8,0.6);
     button.body.immovable = true;
 
 
-    recordsBtn = game.add.sprite(game.width / 3 * 2, game.height * 0.9, 'recordsBtn');
+    recordsBtn = game.add.sprite(game.width / 3 * 2, game.height * 0.93, 'recordsBtn');
     recordsBtn.anchor.x = 0.5;
     //recordsBtn.index = 10;
     recordsBtn.inputEnabled = true;
     recordsBtn.events.onInputDown.add(checkSite);
     game.physics.arcade.enableBody(recordsBtn);
+    recordsBtn.scale.setTo(0.8,0.6);
     recordsBtn.body.immovable = true;
     // buttonBounds = new Phaser.Rectangle(0, game.height * 0.85, game.width, game.height * 0.15);
     // //  Create a graphic so you can see the bounds
@@ -414,6 +439,8 @@ function update() {
 
 function collectStar(player, star) {
     // console.log(stars);
+    console.log(stars.enableBody);
+    if(stars.enableBody == true)
     star.destroy();
 }
 
@@ -531,6 +558,7 @@ function buildAndRun() {
     //player.stopVelocity();
     player.body.velocity.set(0, 0);
     if (state == 'run') {
+        //stars.enableBody = false;
         player.body.immovable = false;
         player.body.allowGravity = true;
         //run模式
@@ -548,6 +576,7 @@ function buildAndRun() {
 
 
     if (state == 'build') {
+        stars.enableBody = false;
         player.body.immovable = true;
         player.body.allowGravity = false;
         //build模式
@@ -568,7 +597,7 @@ function resetPlayer() {
 }
 
 function putStarsandBlocks(siteNum) {
-    stars.enableBody = true;
+   
 
     if (flag.visible == false) {
         flag = game.add.sprite(data[siteNum - 1].flag.x, data[siteNum - 1].flag.y, 'flag');
@@ -577,9 +606,11 @@ function putStarsandBlocks(siteNum) {
     }
 
     // 148 25  411 185
+    stars.enableBody = true;
     for (var i = 0; i < data[siteNum - 1].stars.length; i++) {
         var s = stars.create(data[siteNum - 1].stars[i].x, data[siteNum - 1].stars[i].y, 'star');
     }
+    
 
     //blocks.enableBody = true;
     //rects.inputEnabled = true;
