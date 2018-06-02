@@ -378,7 +378,7 @@ var data = [{
             x: 510,
             y: 190
         }}, {}, {}];
-
+//关卡结束
 function preload() {
     // game.load.spritesheet('block0', 'block0.png', 64, 32);
     // game.load.spritesheet('block1', 'block1.png', 64, 32);
