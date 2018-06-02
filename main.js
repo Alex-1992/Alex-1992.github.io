@@ -203,51 +203,181 @@ var data = [{
 }, {
     //stage 6
     stars: [{
-        x: 550,
+        x: 370,
         y: 200
     }, {
-        x: 250,
-        y: 200
+        x: 650,//111
+        y: 245
     }, {
-        x: 600,
-        y: 270
+        x: 470,
+        y: 370
     }],
 
     blocks: [{
-        index: 1,
-        x: 508,
-        y: 310
+        index: 0,
+        x: 700,
+        y: 448
     }, {
-        index: 2,
-        x: 320,
+        index: 1,//1111
+        x: 670,
+        y: 272
+    }, {
+        index: 4,
+        x: 140,
         y: 300
     }, {
         index: 3,
-        x: 140,
-        y: 300
+        x: 365,
+        y: 235
+    }, {
+        index: 1,
+        x: 470,
+        y: 400
     }],
 
     bricks: [{
-        index: 0,
+        index: 1,
     }, {
         index: 1,
     }, {
-        index: 2,
+        index: 3,
+    }, {
+        index: 4,
     }],
 
     player: {
-        x: 50,
-        y: 250
+        x: 210,
+        y: 150
     },
     button: {
         x: 40,
         y: 300
     },
     flag: {
-        x: 370,
-        y: 380
+        x: 170,
+        y: 270
     }
-}, {}, {}, {}, {}];
+}, {//stage 7
+    stars: [{
+        x: 370,
+        y: 275
+    }, {
+        x: 650,//111
+        y: 245
+    }, {
+        x: 540,
+        y: 220
+    }],
+
+    blocks: [{
+        index: 3,
+        x: 350,
+        y: 300
+    }, {
+        index: 0,//1111
+        x: 600,
+        y: 300
+    }],
+
+    bricks: [ {
+        index: 3,
+    }, {
+        index: 4,
+    }],
+
+    player: {
+        x: 150,
+        y: 150
+    },
+    button: {
+        x: 40,
+        y: 300
+    },
+    flag: {
+        x: 600,
+        y: 270
+    }}, {//stage 8
+        stars: [{
+            x: 540,
+            y: 190
+        }, {
+            x: 710,
+            y: 310
+        }, {
+            x: 520,
+            y: 360
+        }],
+    
+        blocks: [{
+            index: 4,
+            x: 170,
+            y: 172
+        }, {
+            index: 4,
+            x: 266,
+            y: 172
+        }, {
+            index: 4,
+            x: 362,
+            y: 172
+        }, {
+            index: 4,
+            x: 500,
+            y: 172
+        }, {
+            index: 0,
+            x: 400,
+            y: 244+40
+        }, {
+            index: 0,
+            x: 304,
+            y: 244+40
+        }, {
+            index: 0,
+            x: 208,
+            y: 244+40
+        }, {
+            index: 0,
+            x: 70,
+            y: 244+40
+        }, {
+            index: 4,
+            x: 170+10,
+            y: 316+80
+        }, {
+            index: 4,
+            x: 266+10,
+            y: 316+80
+        }, {
+            index: 4,
+            x: 362+10,
+            y: 316+80
+        }, {//111
+            index: 4,
+            x: 458+10,
+            y: 316+80
+        }],
+    
+        bricks: [ {
+            index: 1,
+        }, {
+            index: 1,
+        }, {
+            index: 3,
+        }],
+    
+        player: {
+            x: 170,
+            y: 120
+        },
+        button: {
+            x: 40,
+            y: 300
+        },
+        flag: {
+            x: 510,
+            y: 190
+        }}, {}, {}];
 
 function preload() {
     // game.load.spritesheet('block0', 'block0.png', 64, 32);
@@ -396,6 +526,7 @@ function create() {
 }
 
 
+
 function update() {
     game.physics.arcade.collide(player, bottomGround);
     //game.physics.arcade.collide(player, ground);
@@ -439,8 +570,6 @@ function update() {
 
 function collectStar(player, star) {
     // console.log(stars);
-    console.log(stars.enableBody);
-    if(stars.enableBody == true)
     star.destroy();
 }
 
@@ -577,6 +706,7 @@ function buildAndRun() {
 
     if (state == 'build') {
         stars.enableBody = false;
+        //player.enableBody = false;
         player.body.immovable = true;
         player.body.allowGravity = false;
         //build模式
