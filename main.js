@@ -18,7 +18,7 @@ var state = 'run';
 var text;
 var bounds;
 var bottomGround;
-var currentSite = 2;
+var currentSite = 1;
 var ground;
 var graphicsGround;
 var headWindow;
